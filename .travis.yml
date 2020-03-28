@@ -1,0 +1,27 @@
+language: go
+go:
+  - 1.12
+
+env:
+  global:
+    - GO111MODULE=on
+    - KAFKA_PEERS=localhost:9091
+    - ZOOKEEPER_PEERS=localhost:2181
+    - INSTALL_ROOT=/home/travis
+    - KAFKA_HOSTNAME=localhost
+    - ZK_NODE_COUNT=1
+    - KAFKA_NODE_COUNT=3
+    - REPLICATION_FACTOR=1
+  matrix:
+    - KAFKA_VERSION=1.1.1
+    - KAFKA_VERSION=2.3.0
+
+before_install:
+  - export REPOSITORY_ROOT=${TRAVIS_BUILD_DIR}
+  - ./vagrant/install_cluster.sh
+  - ./vagrant/boot_cluster.sh
+  - ./vagrant/create_topics.sh
+
+script: ./scripts/travis_build.sh
+after_script: ./vagrant/shutdown_cluster.sh
+sudo: false
